@@ -1,171 +1,217 @@
 /*
-	Eventually by HTML5 UP
+	Helios by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
-(function() {
+(function($) {
 
-	"use strict";
+	var	$window = $(window),
+		$body = $('body'),
+		settings = {
 
-	var	$body = document.querySelector('body');
+			// Carousels
+				carousels: {
+					speed: 4,
+					fadeIn: true,
+					fadeDelay: 250
+				},
 
-	// Methods/polyfills.
+		};
 
-		// classList | (c) @remy | github.com/remy/polyfills | rem.mit-license.org
-			!function(){function t(t){this.el=t;for(var n=t.className.replace(/^\s+|\s+$/g,"").split(/\s+/),i=0;i<n.length;i++)e.call(this,n[i])}function n(t,n,i){Object.defineProperty?Object.defineProperty(t,n,{get:i}):t.__defineGetter__(n,i)}if(!("undefined"==typeof window.Element||"classList"in document.documentElement)){var i=Array.prototype,e=i.push,s=i.splice,o=i.join;t.prototype={add:function(t){this.contains(t)||(e.call(this,t),this.el.className=this.toString())},contains:function(t){return-1!=this.el.className.indexOf(t)},item:function(t){return this[t]||null},remove:function(t){if(this.contains(t)){for(var n=0;n<this.length&&this[n]!=t;n++);s.call(this,n,1),this.el.className=this.toString()}},toString:function(){return o.call(this," ")},toggle:function(t){return this.contains(t)?this.remove(t):this.add(t),this.contains(t)}},window.DOMTokenList=t,n(Element.prototype,"classList",function(){return new t(this)})}}();
-
-		// canUse
-			window.canUse=function(p){if(!window._canUse)window._canUse=document.createElement("div");var e=window._canUse.style,up=p.charAt(0).toUpperCase()+p.slice(1);return p in e||"Moz"+up in e||"Webkit"+up in e||"O"+up in e||"ms"+up in e};
-
-		// window.addEventListener
-			(function(){if("addEventListener"in window)return;window.addEventListener=function(type,f){window.attachEvent("on"+type,f)}})();
+	// Breakpoints.
+		breakpoints({
+			wide:      [ '1281px',  '1680px' ],
+			normal:    [ '961px',   '1280px' ],
+			narrow:    [ '841px',   '960px'  ],
+			narrower:  [ '737px',   '840px'  ],
+			mobile:    [ null,      '736px'  ]
+		});
 
 	// Play initial animations on page load.
-		window.addEventListener('load', function() {
+		$window.on('load', function() {
 			window.setTimeout(function() {
-				$body.classList.remove('is-preload');
+				$body.removeClass('is-preload');
 			}, 100);
 		});
 
-	// Slideshow Background.
-		(function() {
+	// Dropdowns.
+		$('#nav > ul').dropotron({
+			mode: 'fade',
+			speed: 350,
+			noOpenerFade: true,
+			alignment: 'center'
+		});
 
-			// Settings.
-				var settings = {
+	// Scrolly.
+		$('.scrolly').scrolly();
 
-					// Images (in the format of 'url': 'alignment').
-						images: {
-							'images/bg01.jpg': 'center',
-							'images/bg02.jpg': 'center',
-							'images/bg03.jpg': 'center'
-						},
+	// Nav.
 
-					// Delay.
-						delay: 6000
+		// Button.
+			$(
+				'<div id="navButton">' +
+					'<a href="#navPanel" class="toggle"></a>' +
+				'</div>'
+			)
+				.appendTo($body);
 
-				};
+		// Panel.
+			$(
+				'<div id="navPanel">' +
+					'<nav>' +
+						$('#nav').navList() +
+					'</nav>' +
+				'</div>'
+			)
+				.appendTo($body)
+				.panel({
+					delay: 500,
+					hideOnClick: true,
+					hideOnSwipe: true,
+					resetScroll: true,
+					resetForms: true,
+					target: $body,
+					visibleClass: 'navPanel-visible'
+				});
 
-			// Vars.
-				var	pos = 0, lastPos = 0,
-					$wrapper, $bgs = [], $bg,
-					k, v;
+	// Carousels.
+		$('.carousel').each(function() {
 
-			// Create BG wrapper, BGs.
-				$wrapper = document.createElement('div');
-					$wrapper.id = 'bg';
-					$body.appendChild($wrapper);
+			var	$t = $(this),
+				$forward = $('<span class="forward"></span>'),
+				$backward = $('<span class="backward"></span>'),
+				$reel = $t.children('.reel'),
+				$items = $reel.children('article');
 
-				for (k in settings.images) {
+			var	pos = 0,
+				leftLimit,
+				rightLimit,
+				itemWidth,
+				reelWidth,
+				timerId;
 
-					// Create BG.
-						$bg = document.createElement('div');
-							$bg.style.backgroundImage = 'url("' + k + '")';
-							$bg.style.backgroundPosition = settings.images[k];
-							$wrapper.appendChild($bg);
+			// Items.
+				if (settings.carousels.fadeIn) {
 
-					// Add it to array.
-						$bgs.push($bg);
+					$items.addClass('loading');
+
+					$t.scrollex({
+						mode: 'middle',
+						top: '-20vh',
+						bottom: '-20vh',
+						enter: function() {
+
+							var	timerId,
+								limit = $items.length - Math.ceil($window.width() / itemWidth);
+
+							timerId = window.setInterval(function() {
+								var x = $items.filter('.loading'), xf = x.first();
+
+								if (x.length <= limit) {
+
+									window.clearInterval(timerId);
+									$items.removeClass('loading');
+									return;
+
+								}
+
+								xf.removeClass('loading');
+
+							}, settings.carousels.fadeDelay);
+
+						}
+					});
 
 				}
 
-			// Main loop.
-				$bgs[pos].classList.add('visible');
-				$bgs[pos].classList.add('top');
-
-				// Bail if we only have a single BG or the client doesn't support transitions.
-					if ($bgs.length == 1
-					||	!canUse('transition'))
-						return;
-
-				window.setInterval(function() {
-
-					lastPos = pos;
-					pos++;
-
-					// Wrap to beginning if necessary.
-						if (pos >= $bgs.length)
-							pos = 0;
-
-					// Swap top images.
-						$bgs[lastPos].classList.remove('top');
-						$bgs[pos].classList.add('visible');
-						$bgs[pos].classList.add('top');
-
-					// Hide last image after a short delay.
-						window.setTimeout(function() {
-							$bgs[lastPos].classList.remove('visible');
-						}, settings.delay / 2);
-
-				}, settings.delay);
-
-		})();
-
-	// Signup Form.
-		(function() {
-
-			// Vars.
-				var $form = document.querySelectorAll('#signup-form')[0],
-					$submit = document.querySelectorAll('#signup-form input[type="submit"]')[0],
-					$message;
-
-			// Bail if addEventListener isn't supported.
-				if (!('addEventListener' in $form))
-					return;
-
-			// Message.
-				$message = document.createElement('span');
-					$message.classList.add('message');
-					$form.appendChild($message);
-
-				$message._show = function(type, text) {
-
-					$message.innerHTML = text;
-					$message.classList.add(type);
-					$message.classList.add('visible');
-
-					window.setTimeout(function() {
-						$message._hide();
-					}, 3000);
-
+			// Main.
+				$t._update = function() {
+					pos = 0;
+					rightLimit = (-1 * reelWidth) + $window.width();
+					leftLimit = 0;
+					$t._updatePos();
 				};
 
-				$message._hide = function() {
-					$message.classList.remove('visible');
-				};
+				$t._updatePos = function() { $reel.css('transform', 'translate(' + pos + 'px, 0)'); };
 
-			// Events.
-			// Note: If you're *not* using AJAX, get rid of this event listener.
-				$form.addEventListener('submit', function(event) {
+			// Forward.
+				$forward
+					.appendTo($t)
+					.hide()
+					.mouseenter(function(e) {
+						timerId = window.setInterval(function() {
+							pos -= settings.carousels.speed;
 
-					event.stopPropagation();
-					event.preventDefault();
+							if (pos <= rightLimit)
+							{
+								window.clearInterval(timerId);
+								pos = rightLimit;
+							}
 
-					// Hide message.
-						$message._hide();
+							$t._updatePos();
+						}, 10);
+					})
+					.mouseleave(function(e) {
+						window.clearInterval(timerId);
+					});
 
-					// Disable submit.
-						$submit.disabled = true;
+			// Backward.
+				$backward
+					.appendTo($t)
+					.hide()
+					.mouseenter(function(e) {
+						timerId = window.setInterval(function() {
+							pos += settings.carousels.speed;
 
-					// Process form.
-					// Note: Doesn't actually do anything yet (other than report back with a "thank you"),
-					// but there's enough here to piece together a working AJAX submission call that does.
-						window.setTimeout(function() {
+							if (pos >= leftLimit) {
 
-							// Reset form.
-								$form.reset();
+								window.clearInterval(timerId);
+								pos = leftLimit;
 
-							// Enable submit.
-								$submit.disabled = false;
+							}
 
-							// Show message.
-								$message._show('success', 'Thank you!');
-								//$message._show('failure', 'Something went wrong. Please try again.');
+							$t._updatePos();
+						}, 10);
+					})
+					.mouseleave(function(e) {
+						window.clearInterval(timerId);
+					});
 
-						}, 750);
+			// Init.
+				$window.on('load', function() {
+
+					reelWidth = $reel[0].scrollWidth;
+
+					if (browser.mobile) {
+
+						$reel
+							.css('overflow-y', 'hidden')
+							.css('overflow-x', 'scroll')
+							.scrollLeft(0);
+						$forward.hide();
+						$backward.hide();
+
+					}
+					else {
+
+						$reel
+							.css('overflow', 'visible')
+							.scrollLeft(0);
+						$forward.show();
+						$backward.show();
+
+					}
+
+					$t._update();
+
+					$window.on('resize', function() {
+						reelWidth = $reel[0].scrollWidth;
+						$t._update();
+					}).trigger('resize');
 
 				});
 
-		})();
+		});
 
-})();
+})(jQuery);
