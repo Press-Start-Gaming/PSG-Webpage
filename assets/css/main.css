@@ -1796,7 +1796,7 @@ input, select, textarea {
 		}
 
 		.image.logo {
-			width: 20%;
+			width: 100%;
 		}
 		
 		.image.featured {
@@ -2059,7 +2059,7 @@ input, select, textarea {
 	.button {
 		position: relative;
 		display: inline-block;
-		background: #df7366;
+		background: #3633d8;
 		color: #fff;
 		text-align: center;
 		border-radius: 0.5em;
@@ -2081,7 +2081,7 @@ input, select, textarea {
 		button:hover,
 		.button:hover {
 			color: #fff;
-			background: #ef8376;
+			background: #5a4bf5;
 		}
 
 		input[type="button"].alt,
@@ -2089,7 +2089,7 @@ input, select, textarea {
 		input[type="reset"].alt,
 		button.alt,
 		.button.alt {
-			background: #2B252C;
+			background: #d0665a;
 		}
 
 			input[type="button"].alt:hover,
@@ -2097,7 +2097,7 @@ input, select, textarea {
 			input[type="reset"].alt:hover,
 			button.alt:hover,
 			.button.alt:hover {
-				background: #3B353C;
+				background: #ef8376;
 			}
 
 /* Post */
@@ -2180,7 +2180,7 @@ input, select, textarea {
 
 	#header {
 		position: relative;
-		background-image: url("../../images/header.jpg");
+		background-image: url("../../images/header.png");
 		background-size: cover;
 		background-position: center center;
 		background-attachment: fixed;
@@ -2261,7 +2261,7 @@ input, select, textarea {
 
 		body.homepage #header:after {
 			content: '';
-			background: #1C0920;
+			background: #06041e;
 			display: block;
 			position: absolute;
 			left: 0;
@@ -2269,14 +2269,14 @@ input, select, textarea {
 			width: 100%;
 			height: 100%;
 			opacity: 0;
-			-moz-transition: opacity 2.5s ease-in-out;
-			-webkit-transition: opacity 2.5s ease-in-out;
-			-ms-transition: opacity 2.5s ease-in-out;
-			transition: opacity 2.5s ease-in-out;
-			-moz-transition-delay: 0.5s;
-			-webkit-transition-delay: 0.5s;
-			-ms-transition-delay: 0.5s;
-			transition-delay: 0.5s;
+			-moz-transition: opacity 1.5s ease-in-out;
+			-webkit-transition: opacity 1.5s ease-in-out;
+			-ms-transition: opacity 1.5s ease-in-out;
+			transition: opacity 1.5s ease-in-out;
+			-moz-transition-delay: 0s;
+			-webkit-transition-delay: 0s;
+			-ms-transition-delay: 0s;
+			transition-delay: 0s;
 		}
 
 	body.homepage.is-preload #header:after {
@@ -2301,7 +2301,7 @@ input, select, textarea {
 			position: relative;
 			display: inline-block;
 			margin: 0;
-			height: 21px;
+			height: 30px;
 			border-left: solid 1px rgba(192, 192, 192, 0.35);
 			border-right: solid 1px rgba(192, 192, 192, 0.35);
 		}
@@ -2312,7 +2312,7 @@ input, select, textarea {
 				width: 300%;
 				position: absolute;
 				top: 50%;
-				margin-top: -2px;
+				margin-top: -3px;
 				height: 5px;
 				border-top: solid 1px rgba(192, 192, 192, 0.35);
 				border-bottom: solid 1px rgba(192, 192, 192, 0.35);
