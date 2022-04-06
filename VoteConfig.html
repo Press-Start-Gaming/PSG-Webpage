@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Map vote plugin configuration generator</title>
+	<style>
+		*
+		{
+			background-color: lightgray;
+		}
+
+		div#main
+		{
+			display: flex;
+			justify-content: space-around;
+			margin: auto;
+		}
+		
+		div.pannel
+		{
+			border: black;
+			border-radius: 15px;
+			border-style: solid;
+			padding: 10px;
+			padding-bottom: 30px;
+		}
+
+		li.rule
+		{
+			border: 1px solid black;
+			border-radius: 10px;
+			padding: 5px;
+			margin: 2px;
+		}
+
+		ul.rules
+		{
+			margin: 5px;
+			padding: 2px;
+			overflow: clip;
+			overflow-y: scroll;
+			width: 82ch;
+			height: 100ch;
+			border: solid black;
+		}
+
+		ul.nomination_list
+		{
+			list-style-type: none;
+			padding: 2px;
+			margin-top: 2px;
+			margin-bottom: 2px;
+			width: 75ch;
+			min-height: 5ch;
+			border: solid black;
+		}
+
+		ul.border_list
+		{
+			list-style-type: none;
+			margin: 5px;
+			padding: 2px;
+			overflow: clip;
+			overflow-y: scroll;
+			width: 75ch;
+			height: 10ch;
+			border: solid black;
+		}
+
+		li.selected
+		{
+			background-color: cadetblue;
+		}
+
+		div#info
+		{
+			margin: 2%;
+		}
+
+		li.nomination
+		{
+			border: 1px solid black;
+			margin: 5px;
+			padding: 5px;
+		}
+
+		input.short_input
+		{
+			width: 10ch;
+		}
+
+		input.rule_input
+		{
+			width: 30ch;
+		}
+
+		.graph_container
+		{
+			overflow: hidden;
+		}
+	</style>
+</head>
+<body>
+	<div id="main">
+		<div id="left" class="pannel">
+			<div id="controls">
+				<button id="save">save</button>
+				<input type="file" id="load" accept=".json">
+			</div>
+			<div id="rules_pannel">
+				<h3>vote rules:</h3>
+				<button id="add_rule">add rule</button>
+				<ul id="rules_list" class="rules"></ul>
+			</div>
+			<div id="modes">
+				<h3>mode strings (case sensitive):</h3>
+				<ul id="modes_list" class="border_list"></ul>
+				<input type="text" id="mode_input">
+				<button id="add_mode">add</button>
+				<button id="remove_mode">remove</button>
+			</div>
+			<div id="addons">
+				<h3>addon layer strings:</h3>
+				(not currently implemented)
+				<ul id="addons_list"></ul>
+				<input type="text">
+				<button>add</button>
+				<button>remove</button>
+			</div>
+		</div>
+		<div id="info">
+			<button onclick="render_graph()">render graph</button>
+			<div class="pannel" style="width: 95%;">
+				<div id="graph_container" class="graph_container"></div>
+			</div>
+			<h3>info:</h3>
+			tool by maskedmonkyman <br>
+			<h4>warning:</h4>
+			<p>
+				this tool is a thin wrapper around
+				the Squad JS pluggin config schemea. This tool
+				does <b>NO INPUT VALIDATION</b> and is just a graphical utility.
+				It is very possible to create broken configs using
+				this tool. Be sure to check your inputs.
+			</p>
+
+			<h4>notes:</h4>
+			<ol>
+				<li>
+					be sure to always have a "defualt" vote rule.
+				</li>
+				<li>
+					the Any option for modes, will select modes from the
+					mode strings section so be sure to fill it out.
+				</li>
+				<li>
+					The plugin looks for maps from specific to general so if the
+					current layer is Yehorivka_RAAS_v1 then the plugin will look for rules: <br>
+					Yehorivka_RAAS_v1 <br>
+					Yehorivka_RAAS <br>
+					Yehorivka <br>
+					defualt <br>
+					then load from the first one it finds
+				</li>
+			</ol>
+			</p>
+		</div>
+	</div>
+	<script src="configTool/viz.js"></script>
+	<script src="configTool/full.render.js"></script>
+	<script src="configTool/svg-pan-zoom.min.js" type="text/javascript" charset="utf-8"></script>
+	<script>
+		"use strict";
+		//TODO addon layers
+		const save_button = document.getElementById("save");
+		const load_button = document.getElementById("load");
+		//rules
+		const add_rule_button = document.getElementById("add_rule");
+		const remove_rule_button = document.getElementById("remove_rule");
+		const rules_list = document.getElementById("rules_list");
+		let selected_rule = null;
+		//mode
+		const add_mode_button = document.getElementById("add_mode");
+		const remove_mode_button = document.getElementById("remove_mode");
+		const mode_input = document.getElementById("mode_input");
+		const modes_list = document.getElementById("modes_list");
+		let selected_mode = null;
+
+		let svg_element = null;
+
+		function fetch_layer_strings()
+		{
+			const wiki_url = "https://raw.githubusercontent.com/Squad-Wiki-Editorial/squad-wiki-pipeline-map-data/master/completed_output/_Current%20Version/finished.json";
+			let layer_strings = [];
+
+			fetch(wiki_url).then(response=>response.json()).then(function(response){
+				for(const layer of response.Maps)
+					layer_strings.push(layer.rawName);
+			});
+
+			return layer_strings;
+		}
+
+		function render_graph()
+		{
+			const graph = build_graph_string(build_vote_rules());
+			//let layer_strings = fetch_layer_strings();
+			var viz = new Viz();
+			
+			if (svg_element)
+				svg_element.parentNode.removeChild(svg_element);
+
+			viz.renderSVGElement(graph, {"engine" : "circo"})
+			.then(function(element) {
+				svg_element = element;
+				
+				//set svg to the size of it's container
+				svg_element.setAttribute("width", "100%");
+				//remove height initially to auto scale
+				svg_element.removeAttribute("height");
+
+				document.getElementById("graph_container").appendChild(svg_element);
+				let panZoom = svgPanZoom(svg_element, {
+					zoomEnabled: true,
+          			controlIconsEnabled: true,
+          			fit: false,
+          			center: true
+				});
+				
+				//hacky work around for pan zoom so it scale properly
+				svg_element.setAttribute("height", `${panZoom.getSizes().height}px`)
+			})
+			.catch(error => {
+				// Create a new Viz instance (@see Caveats page for more info)
+				viz = new Viz();
+
+				// Possibly display the error
+				console.error(error);
+			});		
+		}
+
+		function build_graph_string(vote_rules)
+		{
+			let graph = "digraph G \n";
+			graph += "\{";
+			let rules = vote_rules.rules;
+			for(const rule in rules)
+			{
+				const nomination = rules[rule];
+				
+				for (const layer of nomination)
+				{
+					graph += `${rule} -> ${layer.map}\n`;
+				}
+			}
+			graph += "\}";
+			return graph;
+		}
+
+		function build_vote_rules()
+		{
+			let vote_rules = {
+				"modes": [],
+				"rules": {},
+				"addon_map_layer_strings": []
+			};
+
+			for(let mode of modes_list.children)
+			{
+				vote_rules.modes.push(mode.innerHTML.trim());
+			}
+
+			for(let rule_element of rules_list.children)
+			{
+				let rule = {
+					"name": rule_element.rule_string_input.value,
+					"nominations": []
+				};
+				for (let nomination of rule_element.nomination_list.children)
+				{
+					rule.nominations.push({
+						"map": nomination.map_input.value.trim(),
+						"modes": nomination.mode_input.value.trim().split(',').map(e => e.trim()), 
+						"versions": nomination.verison_input.value.trim().split(',').map(e => e.trim())
+					});
+				}
+				vote_rules.rules[rule.name] = rule.nominations;
+			}
+
+			return vote_rules;
+		}
+
+		add_rule_button.onclick = ()=>{
+			let rule = build_rule_element();
+			rules_list.appendChild(rule);
+		};
+
+		add_mode_button.onclick = () => {
+			if (mode_input.value == "")
+				return;
+			add_mode(mode_input.value);
+		};
+
+		function add_mode(mode_string)
+		{
+			let mode = document.createElement("li");
+			mode.innerHTML = mode_string;
+			modes_list.appendChild(mode);
+			mode.onclick = () => {
+				if (selected_mode)
+				{
+					selected_mode.classList.remove("selected");
+				}
+				selected_mode = mode;
+				selected_mode.classList.add("selected");
+			};
+		}
+
+		remove_mode_button.onclick = () => {
+			if (selected_mode)
+			{
+				selected_mode.parentNode.removeChild(selected_mode);
+				selected_mode = null;
+			}
+		};
+
+		save_button.onclick = () => {
+			let vote_rules = build_vote_rules();
+			var a = document.createElement("a");
+			a.href = window.URL.createObjectURL(new Blob([JSON.stringify(vote_rules)], {type: "text/plain"}));
+			a.download = "vote_rules.json";
+			a.click();
+		};
+
+		load_button.onchange = () => {
+			let reader = new FileReader();
+			rules_list.innerHTML = "";
+			modes_list.innerHTML = "";
+			reader.addEventListener("load", (event) => {
+				let vote_rules = JSON.parse(event.target.result);
+
+				for (let mode of vote_rules.modes)
+					add_mode(mode);
+
+				let rules = Object.keys(vote_rules.rules).sort();
+
+				for (let rule of rules)
+				{
+					let rule_element = build_rule_element();
+					rule_element.rule_string_input.value = rule;
+					rules_list.appendChild(rule_element);
+					for(let nomination of vote_rules.rules[rule])
+					{
+						let nomination_element = build_nomination_element(nomination.map, nomination.modes, nomination.versions);
+						rule_element.nomination_list.appendChild(nomination_element);
+					}
+				}
+			});
+			reader.readAsText(load_button.files[0]);
+		};
+
+		function build_rule_element()
+		{
+			let rule = document.createElement("li");
+			rule.classList.add("rule");
+			let label = document.createElement("label");
+			label.innerHTML = "Rule string: ";
+			let input = document.createElement("input");
+			input.setAttribute("type", "text");
+			input.classList.add("rule_input");
+			label.appendChild(input);
+			rule.appendChild(label);
+			rule["rule_string_input"] = input;
+			
+			let add_nomination_button = document.createElement("button");
+			add_nomination_button.innerHTML = "add nomination";
+			rule.appendChild(add_nomination_button);
+
+			let nominations_list = document.createElement("ul");
+			nominations_list.classList.add("nomination_list");
+			rule.appendChild(nominations_list);
+			rule["nomination_list"] = nominations_list;
+
+			let delete_button = document.createElement("button");
+			delete_button.innerHTML = "delete";
+			rule.appendChild(delete_button);
+
+			add_nomination_button.onclick = () => {
+				nominations_list.appendChild(build_nomination_element());
+			};
+
+			delete_button.onclick = () => {
+				rule.parentNode.removeChild(rule);
+			}
+			return rule;
+		}
+
+		function build_nomination_element(map_string = "", mode_string = "Any", version_string = "Any")
+		{
+			let nomination = document.createElement("li");
+			nomination.classList.add("nomination");
+
+			//map field
+			let map_label = document.createElement("label");
+			map_label.innerHTML = "Map:";
+			nomination.appendChild(map_label);
+			let map_input = document.createElement("input");
+			map_input.setAttribute("type", "text");
+			map_input.value = map_string;
+			map_label.appendChild(map_input);
+			nomination["map_input"] = map_input;
+
+			//mode field
+			let mode_label = document.createElement("label");
+			mode_label.innerHTML = "Mode(s):";
+			nomination.appendChild(mode_label);
+			let mode_input = document.createElement("input");
+			mode_input.setAttribute("type", "text");
+			mode_input.classList.add("short_input");
+			mode_input.value = mode_string;
+			mode_label.appendChild(mode_input);
+			nomination["mode_input"] = mode_input;
+			
+			//version feild
+			let version = document.createElement("label");
+			version.innerHTML = "Version(s):";
+			nomination.appendChild(version);
+			let verison_input = document.createElement("input");
+			verison_input.setAttribute("type", "text");
+			verison_input.classList.add("short_input");
+			verison_input.value = version_string;
+			version.appendChild(verison_input);
+			nomination["verison_input"] = verison_input;
+
+			//delete button
+			let delete_button = document.createElement("button");
+			delete_button.innerHTML = "delete";
+			delete_button.onclick = () => {
+				nomination.parentNode.removeChild(nomination);
+			};
+			nomination.appendChild(delete_button);
+
+			return nomination;
+		}
+
+		function main()
+		{
+			console.log("hello world");
+		}
+		
+		document.addEventListener("DOMContentLoaded", main);
+	</script>
+</body>
+</html>

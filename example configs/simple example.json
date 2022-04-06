@@ -1,0 +1,42 @@
+{
+    "modes":
+    [
+        "AAS",
+        "RAAS",
+        "Invasion"
+    ],
+
+    "rules": 
+    {
+        "Gorodok":
+        [
+            {"map": "Yehorivka", "modes": ["Any"], "versions": ["Any"]},
+            {"map": "Gorodok", "modes": ["Any"], "versions": ["Any"]}
+        ],
+
+        "Gorodok_Invasion":
+        [
+            {"map": "Yehorivka", "modes": ["Any"], "versions": ["Any"]}
+        ],
+
+        "Yehorivka_RAAS_v1":
+        [
+            {"map": "Gorodok", "modes": ["AAS"], "versions": ["Any"]}
+        ],
+
+        "default":
+        [
+            {"map": "Yehorivka", "modes": ["Any"], "versions": ["Any"]},
+            {"map": "Gorodok", "modes": ["Any"], "versions": ["Any"]}
+        ]
+    },
+
+    "addon_map_layer_strings": 
+    {
+        "example": 
+        [
+            "string1",
+            "string2"
+        ]
+    }
+}
