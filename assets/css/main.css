@@ -138,6 +138,11 @@ input, select, textarea {
 		margin: 0 0 0.25em 0;
 	}
 
+	h5 {
+		font-size: 1.8em;
+		margin: 0 0 0.25em 0;
+	}
+
 	strong, b {
 		font-weight: 400;
 		color: #483949;
@@ -2515,6 +2520,12 @@ input, select, textarea {
 				}
 
 /* Carousel */
+
+	.carouseltitle {
+		text-align: center;
+		padding: 2.5em 0 1em 0;
+		margin-bottom: 0;
+	}
 
 	.carousel {
 		position: relative;
