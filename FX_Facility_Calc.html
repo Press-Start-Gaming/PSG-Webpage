@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>[PSG] Foxhole Facility Mat Calc</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!--Created by Gabe Valentine. Do not reproduce without express permission. You may contact me at discord.gg/PSG-->
+<style type="text/css">
+body {
+background-color: #96697f;
+}
+.row {
+	display: flex;
+	margin-top: 0px;
+}
+.column {
+	flex: 25%;
+	margin-left: 10px;
+	margin-top: 0px;
+}
+h1 {
+	margin-bottom: 0px;
+	margin-left: 10px;
+}
+h2 {
+	margin-top: 0px;
+}
+h3 {
+	margin-left: 10px;
+}
+p {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+<h1>Foxhole Facility Materials Calculators</h1>
+<h3>This is a work in progress. Find your desired output and fill in each box with how much materials you have on hand. Pressing the calculate button will tell you the quantity you will get and the time to cook that amount.</h3>
+<div class="row"><div class="column">
+
+<h2>POWER</h2>
+	
+	<h2>Diesel Plant</h2>
+		<form id="calculateForm">
+			<label for="inputDieselP">Enter Diesel (Cans):</label>
+			<input type="number" id="inputDieselP" name="dP"><br/>
+			<label for="inputPPa">Enter Number of Plants:</label>
+			<input type="number" id="inputPPa" name="PPa"><br/>
+			<button type="button" onclick="calculateDieselPowerTime()">Calculate Time</button>
+		</form>
+	<p id="dPresult">Hours of Power = </p>
+	<script>
+		function calculateDieselPowerTime() {
+		var dP = document.getElementById('inputDieselP').value;
+		var PPa = document.getElementById('inputPPa').value;
+		var dPTime = ((dP * 3) / 60) / PPa;
+		document.getElementById('dPresult').innerHTML = "Hours of Power = " + dPTime.toFixed(4);
+			}
+    </script>
+	
+	<h2>Petrol Plant</h2>
+		<form id="calculateForm">
+			<label for="inputPetrolP">Enter Petrol (Cans):</label>
+			<input type="number" id="inputPetrolP" name="PetrolP"><br/>
+			<label for="inputPPb">Enter Number of Plants:</label>
+			<input type="number" id="inputPPb" name="PPb"><br/>
+			<button type="button" onclick="calculatePetrolPowerTime()">Calculate Time</button>
+		</form>
+	<p id="pPresult">Hours of Power = </p>
+	<script>
+		function calculatePetrolPowerTime() {
+		var PetrolP = document.getElementById('inputPetrolP').value;
+		var PPb = document.getElementById('inputPPb').value;
+		var pPTime = ((PetrolP * 1.5) / 60) / PPb;
+		document.getElementById('pPresult').innerHTML = "Hours of Power = " + pPTime.toFixed(4);
+			}
+    </script>
+	
+	<h2>Coal Plant</h2>
+		<form id="calculateForm">
+			<label for="inputCoalP">Enter Coal:</label>
+			<input type="number" id="inputCoalP" name="cP"><br/>
+			<label for="inputPPc">Enter Number of Plants:</label>
+			<input type="number" id="inputPPc" name="PPc"><br/>
+			<button type="button" onclick="calculateCoalPowerTime()">Calculate Time</button>
+		</form>
+	<p id="cPresult">Hours of Power = </p>
+	<script>
+		function calculateCoalPowerTime() {
+		var cP = document.getElementById('inputCoalP').value;
+		var PPc = document.getElementById('inputPPc').value;
+		var cPTime = ((cP * 0.025) / 60) / PPc;
+		document.getElementById('cPresult').innerHTML = "Hours of Power = " + cPTime.toFixed(4);
+			}
+    </script>
+	
+	<h2>Coal Station</h2>
+		<form id="calculateForm">
+			<label for="inputCoalS">Enter Coal:</label>
+			<input type="number" id="inputCoalS" name="cS"><br/>
+			<label for="inputWaterS">Enter Water (Cans):</label>
+			<input type="number" id="inputWaterS" name="wS"><br/>
+			<label for="inputPSa">Enter Number of Stations:</label>
+			<input type="number" id="inputPSa" name="PSa"><br/>
+			<button type="button" onclick="calculateCoalStationTime()">Calculate Time</button>
+		</form>
+	<p id="cSresult">Hours of Power = </p>
+	<script>
+		function calculateCoalStationTime() {
+		const inputCoalS = document.getElementById('inputCoalS');
+		const inputWaterS = document.getElementById('inputWaterS');
+		const cSResult = document.getElementById('cSresult');
+		const CoalSTime = ((inputCoalS.value / 30) * 1.5) / 60;
+		const WaterSTime = ((inputWaterS.value * 50) * 1.5) / 60;
+		const cSTime = Math.min(CoalSTime, WaterSTime);
+		cSResult.textContent = `Hours of Power = ${cSTime.toFixed(4)}`;
+			}
+    </script>
+	
+	<h2>Heavy Oil Station</h2>
+	<p>Soon™</p>
+	<h2>Coke Station</h2>
+	<p>Soon™</p>
+	
+</div><div class="column">
+	<h2>BASIC STUFF</h2>
+    <h2>Maintenance Supplies</h2>
+		<form id="calculateForm">
+			<label for="inputMsupp">Enter Salvage:</label>
+			<input type="number" id="inputMsupp" name="A"><br/>
+			<button type="button" onclick="calculateMsuppTime()">Calculate Time</button>
+		</form>
+	<p id="Msuppresult">Minutes of Msupp Queued = </p>
+	<p id="MsuppQuant">Amount of Msupp Queued = </p>
+	<script>
+		function calculateMsuppTime() {
+		var A = document.getElementById('inputMsupp').value;
+		var MsuppTime = ((A / 100) * 25) / 60;
+		var MsuppAmount = (A / 5);
+		document.getElementById('Msuppresult').innerHTML = "Minutes of Msupp Queued = " + MsuppTime.toFixed(4);
+		document.getElementById('MsuppQuant').innerHTML = "Amount of Msupp Queued = " + MsuppAmount.toFixed(4);
+			}
+    </script>
+	
+    <h2>Construction Materials (Basic)</h2>
+		<form id="calculateForm">
+			<label for="inputSalvage2">Enter Salvage:</label>
+			<input type="number" id="inputSalvage2" name="B"><br/>
+			<button type="button" onclick="calculateCmatTime()">Calculate Time</button>
+		</form>
+	<p id="Cmatresult">Hours of Cmat Queued = </p>
+	<p id="CmatQuant">Amount of Cmat Queued = </p>
+	<script>
+		function calculateCmatTime() {
+		var B = document.getElementById('inputSalvage2').value;
+		var CmatAmount = B / 10;
+		var CmatTime = (CmatAmount * 25) / 3600;
+		document.getElementById('Cmatresult').innerHTML = "Hours of Cmat Queued = " + CmatTime.toFixed(4);
+		document.getElementById('CmatQuant').innerHTML = "Amount of Cmat Queued = " + CmatAmount.toFixed(4);
+			}
+    </script>
+
+    <h2>Coke (Basic Recipe)</h2>
+		<form id="calculateForm">
+			<label for="inputCoal">Enter Coal:</label>
+			<input type="number" id="inputCoal" name="Co"><br/>
+			<button type="button" onclick="calculateCoalTime()">Calculate Time</button>
+		</form>
+	<p id="Coalresult">Hours of Coke Queued = </p>
+	<p id="CokeQuant">Amount of Coke Queued = </p>
+	<script>
+		function calculateCoalTime() {
+		var Co = document.getElementById('inputCoal').value;
+		var CoalTime = ((Co / 200) * 4.5) / 60;
+		var CokeAmount = Co * 0.9;
+		document.getElementById('Coalresult').innerHTML = "Hours of Coke Queued = " + CoalTime.toFixed(4);
+		document.getElementById('CokeQuant').innerHTML = "Amount of Coke Queued = " + CokeAmount.toFixed(4);
+			}
+    </script>
+
+</div><div class="column">
+	<h2>ASSEMBLY MATERIALS</h2>
+	<h2>Assembly Materials 1</h2>
+		<form id="calculateForm">
+			<label for="inputCoke">Enter Coke:</label>
+			<input type="number" id="inputCoke" name="C"><br/>
+			<label for="inputSalvage3">Enter Salvage:</label>
+			<input type="number" id="inputSalvage3" name="D"><br/>
+			<button type="button" onclick="calculateAM1Time()">Calculate Time</button>
+		</form>
+	<p id="AM1result">Hours of AM1 Queued = </p>
+	<p id="AM1Quant">Amount of AM1 Queued = </p>
+	<script>
+		function calculateAM1Time() {
+		const inputCoke = document.getElementById('inputCoke');
+		const inputSalvage3 = document.getElementById('inputSalvage3');
+		const AM1Result = document.getElementById('AM1result');
+		const CokeTime = ((1 / 4500) * inputCoke.value);
+		const SalvageTime = ((1 / 900) * inputSalvage3.value);
+		const CokeAmount2 = (inputCoke.value / 75);
+		const SalvageAmount = (inputSalvage3.value / 15);
+		const AM1Time = Math.min(CokeTime, SalvageTime);
+		const AM1Amount = Math.min(CokeAmount2, SalvageAmount);
+		AM1Result.textContent = `Hours of AM1 Queued = ${AM1Time.toFixed(4)}`;
+		AM1Quant.textContent = `Amount of AM1 Queued = ${AM1Amount.toFixed(4)}`;
+			}
+    </script>
+	
+	<h2>Assembly Materials 2</h2>
+		<form id="calculateForm">
+			<label for="inputPetrol">Enter Petrol (Cans):</label>
+			<input type="number" id="inputPetrol" name="E"><br/>
+			<label for="inputSalvage4">Enter Salvage:</label>
+			<input type="number" id="inputSalvage4" name="F"><br/>
+			<button type="button" onclick="calculateAM2Time()">Calculate Time</button>
+		</form>
+	<p id="AM2result">Hours of AM2 Queued = </p>
+	<p id="AM2Quant">Amount of AM1 Queued = </p>
+	<script>
+		function calculateAM2Time() {
+		const inputPetrol = document.getElementById('inputPetrol');
+		const inputSalvage3 = document.getElementById('inputSalvage4');
+		const AM2Result = document.getElementById('AM2result');
+		const PetrolTime = (inputPetrol.value / 60);
+		const SalvageTime2 = ((1 / 900) * inputSalvage4.value);
+		const PetrolAmount = inputPetrol.value;
+		const SalvageAmount2 = inputSalvage4.value / 15;
+		const AM2Time = Math.min(PetrolTime, SalvageTime2);
+		const AM2Amount = Math.min(PetrolAmount, SalvageAmount2);
+		AM2Result.textContent = `Hours of AM2 Queued = ${AM2Time.toFixed(4)}`;
+		AM2Quant.textContent = `Amount of AM2 Queued = ${AM2Amount.toFixed(4)}`;
+			}
+    </script>
+	
+    <h2>Assembly Materials 3</h2>
+		<form id="calculateForm">
+			<label for="inputCmat">Enter Cmats:</label>
+			<input type="number" id="inputCmat" name="G"><br/>
+			<label for="inputSulfur">Enter Sulfur:</label>
+			<input type="number" id="inputSulfur" name="H"><br/>
+			<button type="button" onclick="calculateAM3Time()">Calculate Time</button>
+		</form>
+	<p id="AM3result">Hours of AM3 Queued = </p>
+	<p id="AM3Quant">Amount of AM3 Queued = </p>
+	<script>
+		function calculateAM3Time() {
+		const inputCmat = document.getElementById('inputCmat');
+		const inputSulfur = document.getElementById('inputSulfur');
+		const AM3Result = document.getElementById('AM3result');
+		const CmatTime = (inputCmat.value / 90);
+		const SulfurTime = (inputSulfur.value / 600);
+		const CmatAmount2 = (inputCmat.value / 3);
+		const SulfurAmount = (inputSulfur.value / 20);
+		const AM3Time = Math.min(CmatTime, SulfurTime);
+		const AM3Amount = Math.min(CmatAmount2, SulfurAmount);
+		AM3Result.textContent = `Hours of AM3 Queued = ${AM3Time.toFixed(4)}`;
+		AM3Quant.textContent = `Amount of AM3 Queued = ${AM3Amount.toFixed(4)}`;
+			}
+    </script>
+
+    <h2>Assembly Materials 4</h2>
+		<form id="calculateForm">
+			<label for="inputHOil">Enter Heavy Oil (Cans):</label>
+			<input type="number" id="inputHOil" name="I"><br/>
+			<label for="inputPCM">Enter PCM:</label>
+			<input type="number" id="inputPCM" name="J"><br/>
+			<button type="button" onclick="calculateAM4Time()">Calculate Time</button>
+		</form>
+	<p id="AM4result">Hours of AM4 Queued = </p>
+	<p id="AM4Quant">Amount of AM4 Queued = </p>
+	<script>
+		function calculateAM4Time() {
+		const inputHOil = document.getElementById('inputHOil');
+		const inputPCM = document.getElementById('inputPCM');
+		const AM4Result = document.getElementById('AM4result');
+		const HOilTime = (inputHOil.value / 66);
+		const PCMTime = (inputPCM.value / 30);
+		const HOilAmount = (inputHOil.value * 30) / 66;
+		const PCMAmount = inputPCM.value;
+		const AM4Time = Math.min(HOilTime, PCMTime);
+		const AM4Amount = Math.min(HOilAmount, PCMAmount);
+		AM4Result.textContent = `Hours of AM4 Queued = ${AM4Time.toFixed(4)}`;
+		AM4Quant.textContent = `Amount of AM4 Queued = ${AM4Amount.toFixed(4)}`;
+			}
+    </script>
+	
+</div><div class="column">	
+	<h2>ADVANCED STUFF</h2>
+
+    <h2>Processed Construction Materials (Basic)</h2>
+		<form id="calculateForm">
+			<label for="inputCMat2">Enter Construction Materials:</label>
+			<input type="number" id="inputCMat2" name="S"><br/>
+			<label for="inputComp">Enter Components:</label>
+			<input type="number" id="inputComp" name="T"><br/>
+			<button type="button" onclick="calculatePCMTime()">Calculate Time</button>
+		</form>
+	<p id="PCMresult">Hours of PCM Queued = </p>
+	<p id="PCMQuant">Amount of PCM Queued = </p>
+	<script>
+		function calculatePCMTime() {
+		const inputCmat2 = document.getElementById('inputCMat2');
+		const inputComp = document.getElementById('inputComp');
+		const PCMResult = document.getElementById('PCMresult');
+		const CmatTime2 = (inputCmat2.value / 3) / 60;
+		const CompTime = (inputComp.value / 20) / 60;
+		const CmatAmount3 = (inputCmat2.value / 3);
+		const CompAmount1 = (inputComp.value / 20);
+		const PCMTime3 = Math.min(CmatTime2, CompTime);
+		const PCMAmount3 = Math.min(CmatAmount3, CompAmount1);
+		PCMResult.textContent = `Hours of PCM Queued = ${PCMTime3.toFixed(4)}`;
+		PCMQuant.textContent = `Amount of PCM Queued = ${PCMAmount3.toFixed(4)}`;
+			}
+    </script>
+	
+    <h2>Processed Construction Materials (Blast Furnace)</h2>
+		<form id="calculateForm">
+			<label for="inputCMat3">Enter Construction Materials:</label>
+			<input type="number" id="inputCMat3" name="U"><br/>
+			<label for="inputComp2">Enter Components:</label>
+			<input type="number" id="inputComp2" name="V"><br/>
+			<button type="button" onclick="calculatePCMTime2()">Calculate Time</button>
+		</form>
+	<p id="PCMresult2">Hours of PCM Queued = </p>
+	<p id="PCMQuant2">Amount of PCM Queued = </p>
+	<script>
+		function calculatePCMTime2() {
+		const inputCmat3 = document.getElementById('inputCMat3');
+		const inputComp2 = document.getElementById('inputComp2');
+		const PCMResult2 = document.getElementById('PCMresult2');
+		const CmatTime3 = ((inputCmat3.value / 3) / 30) * 3;
+		const CompTime2 = ((inputComp2.value / 55) / 30) * 3;
+		const CmatAmount4 = (inputCmat3.value);
+		const CompAmount2 = (inputComp2.value / 55) * 3;
+		const PCMTime4 = Math.min(CmatTime3, CompTime2);
+		const PCMAmount4 = Math.min(CmatAmount4, CompAmount2);
+		PCMResult2.textContent = `Hours of PCM Queued = ${PCMTime4.toFixed(4)}`;
+		PCMQuant2.textContent = `Amount of PCM Queued = ${PCMAmount4.toFixed(4)}`;
+			}
+    </script>
+
+    <h2>Steel Construction Materials (Basic Recipe)</h2>
+		<form id="calculateForm">
+			<label for="inputPCM2">Enter PCM:</label>
+			<input type="number" id="inputPCM2" name="O"><br/>
+			<label for="inputCoke3">Enter Coke:</label>
+			<input type="number" id="inputCoke3" name="P"><br/>
+			<label for="inputSulfur2">Enter Sulfur:</label>
+			<input type="number" id="inputSulfur2" name="Q"><br/>
+			<label for="inputHOil2">Enter Heavy Oil (Cans):</label>
+			<input type="number" id="inputHOil2" name="R"><br/>
+			<button type="button" onclick="calculateSCMTime2()">Calculate Time</button>
+		</form>
+	<p id="SCMresult">Hours of SCM Queued = </p>
+	<p id="SCMQuant">Amount of SCM Queued = </p>
+	<script>
+		function calculateSCMTime2() {
+		const inputPCM2 = document.getElementById('inputPCM2');
+		const inputCoke3 = document.getElementById('inputCoke3');
+		const inputSulfur2 = document.getElementById('inputSulfur2');
+		const inputHOil2 = document.getElementById('inputHOil2');		
+		const SCMResult = document.getElementById('SCMresult');
+		const PCMTime2 = ((inputPCM2.value / 3) * 1.5) / 60;
+		const CokeTime3 = ((inputCoke3.value / 200) * 1.5) / 60;
+		const SulfurTime2 = ((inputSulfur2.value / 65) * 1.5) / 60;
+		const HOilTime2 = ((inputHOil2.value / 1.1666666) * 1.5) / 60;
+		const PCMAmount2 = (inputPCM2.value / 3);
+		const CokeAmount4 = (inputCoke3.value / 200);
+		const SulfurAmount2 = (inputSulfur2.value / 65);
+		const HOilAmount2 = ((inputHOil2.value * 30) / 35);
+		const SCMTime2 = Math.min(PCMTime2, CokeTime3, SulfurTime2, HOilTime2);
+		const SCMAmount2 = Math.min(PCMAmount2, CokeAmount4, SulfurAmount2, HOilAmount2);
+		SCMResult.textContent = `Hours of SCM Queued = ${SCMTime2.toFixed(4)}`;
+		SCMQuant.textContent = `Amount of SCM Queued = ${SCMAmount2.toFixed(4)}`;
+			}
+    </script>
+	
+	<h2>Assembly Materials 5</h2>
+		<form id="calculateForm">
+			<label for="inputSCM">Enter SCM:</label>
+			<input type="number" id="inputSCM" name="K"><br/>
+			<label for="inputCoke2">Enter Coke:</label>
+			<input type="number" id="inputCoke2" name="L"><br/>
+			<label for="inputAM1">Enter AM1:</label>
+			<input type="number" id="inputAM1" name="M"><br/>
+			<label for="inputAM2">Enter AM2:</label>
+			<input type="number" id="inputAM2" name="N"><br/>
+			<button type="button" onclick="calculateAM5Time()">Calculate Time</button>
+		</form>
+	<p id="AM5result">Hours of AM5 Queued = </p>
+	<p id="AM5Quant">Amount of AM5 Queued = </p>
+	<script>
+		function calculateAM5Time() {
+		const inputSCM = document.getElementById('inputSCM');
+		const inputCoke2 = document.getElementById('inputCoke2');
+		const inputAM1 = document.getElementById('inputAM1');
+		const inputAM2 = document.getElementById('inputAM2');		
+		const AM5Result = document.getElementById('AM5result');
+		const SCMTime = (inputSCM.value / 90);
+		const CokeTime2 = (inputCoke2.value / 7350);
+		const AM1Time2 = (inputAM1.value / 300);
+		const AM2Time2 = (inputAM2.value / 300);
+		const SCMAmount = (inputSCM.value / 3);
+		const CokeAmount3 = (inputCoke2.value / 245);
+		const AM1Amount2 = (inputAM1.value / 10);
+		const AM2Amount2 = (inputAM2.value / 10);
+		const AM5Time = Math.min(SCMTime, CokeTime2, AM1Time2, AM2Time2);
+		const AM5Amount = Math.min(SCMAmount, CokeAmount3, AM1Amount2, AM2Amount2);
+		AM5Result.textContent = `Hours of AM5 Queued = ${AM5Time.toFixed(4)}`;
+		AM5Quant.textContent = `Amount of AM5 Queued = ${AM5Amount.toFixed(4)}`;
+			}
+    </script>
+	
+</div>
+</body>
+</html>
+
+
